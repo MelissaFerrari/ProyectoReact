@@ -13,9 +13,13 @@ export default function Home() {
           Ir a la App
         </Link>
 
-        <Link to="/login" style={styles.secondaryButton}>
+        <Link
+          to="/login"
+          className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition"
+        >
           Iniciar Sesión
         </Link>
+
       </div>
     </div>
   );
