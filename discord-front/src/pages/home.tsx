@@ -10,7 +10,7 @@ export default function Home() {
 
       <div style={styles.buttonContainer}>
         <Link to="/app" style={styles.primaryButton}>
-          Ir a la App
+          Crear usuario
         </Link>
 
         <Link

@@ -22,7 +22,7 @@ function Login() {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      navigate("/app");
+      navigate("/inicio");
     } catch (error) {
       alert("Credenciales incorrectas");
     }

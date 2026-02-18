@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
-import Login from "./pages/login"; // 👈 IMPORTANTE
+import Login from "./pages/login";
+import Inicio from "./pages/inicio";
 
 function App() {
   return (
@@ -8,7 +9,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/app" element={<h1>App Principal</h1>} />
-        <Route path="/login" element={<Login />} /> {/* 👈 usar el componente */}
+        <Route path="/login" element={<Login />} /> 
+        <Route path="/inicio" element={<Inicio />} />
       </Routes>
     </BrowserRouter>
   );
