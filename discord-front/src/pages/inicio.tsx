@@ -1,12 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-
-interface Usuario {
-  id: number;
-  nombre_usuario: string;
-  email: string;
-  fecha_registro: string;
-}
+import { AuthContext } from "../context/authContext";
 
 interface Comunidad {
   id: number;
@@ -15,51 +9,54 @@ interface Comunidad {
 }
 
 function Inicio() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const { usuario, token } = useContext(AuthContext);
   const [comunidades, setComunidades] = useState<Comunidad[]>([]);
 
-  useEffect(() => {
-    // Obtener usuario desde localStorage
-    const userData = localStorage.getItem("usuario");
-    if (userData) {
-      setUsuario(JSON.parse(userData));
+useEffect(() => {
+  const fetchComunidades = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/communities",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setComunidades(response.data);
+    } catch (error) {
+      console.error("Error al traer comunidades:", error);
     }
+  };
 
-    // 🔹 Traer comunidades del backend
-    const fetchComunidades = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3000/api/communities"
-        );
-        setComunidades(response.data);
-      } catch (error) {
-        console.error("Error al traer comunidades:", error);
-      }
-    };
-
+  if (token) {
     fetchComunidades();
-  }, []);
+  }
+}, [token]);
+
+  if (!usuario) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        <h2>No estás autenticado</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       {/* Usuario */}
-      {usuario && (
-        <div className="flex flex-col items-center mb-10">
-          <div className="w-32 h-32 rounded-full bg-blue-600 flex items-center justify-center text-4xl font-bold shadow-lg">
-            {usuario.nombre_usuario.charAt(0).toUpperCase()}
-          </div>
-
-          <h2 className="mt-4 text-2xl font-semibold">
-            {usuario.nombre_usuario}
-          </h2>
-
-          <p className="text-gray-400">{usuario.email}</p>
-          <p className="text-sm text-gray-500">
-            Registrado el:{" "}
-            {new Date(usuario.fecha_registro).toLocaleDateString()}
-          </p>
+      <div className="flex flex-col items-center mb-10">
+        <div className="w-32 h-32 rounded-full bg-blue-600 flex items-center justify-center text-4xl font-bold shadow-lg">
+          {usuario.nombre_usuario.charAt(0).toUpperCase()}
         </div>
-      )}
+
+        <h2 className="mt-4 text-2xl font-semibold">
+          {usuario.nombre_usuario}
+        </h2>
+
+        <p className="text-gray-400">{usuario.email}</p>
+      </div>
 
       {/* Comunidades */}
       <div>

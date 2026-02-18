@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../context/authContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,8 +21,8 @@ function Login() {
 
       const { token, usuario } = response.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      // 🔹 Ahora usamos el contexto
+      login(token, usuario);
 
       navigate("/inicio");
     } catch (error) {
