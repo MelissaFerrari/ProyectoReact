@@ -11,6 +11,7 @@ interface Comunidad {
 function Inicio() {
   const { usuario, token } = useContext(AuthContext);
   const [comunidades, setComunidades] = useState<Comunidad[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
 useEffect(() => {
   const fetchComunidades = async () => {
@@ -35,6 +36,10 @@ useEffect(() => {
   }
 }, [token]);
 
+    const comunidadesFiltradas = comunidades.filter((comunidad) =>
+        comunidad.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
   if (!usuario) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -58,13 +63,22 @@ useEffect(() => {
         <p className="text-gray-400">{usuario.email}</p>
       </div>
 
-      {/* Comunidades */}
+      {/* 📚 Comunidades */}
       <div>
         <h3 className="text-xl font-bold mb-4">Tus Comunidades</h3>
 
+        {/* 🔍 Buscador */}
+        <input
+          type="text"
+          placeholder="Buscar comunidad..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-3 mb-6 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
         <div className="grid gap-4">
-          {comunidades.length > 0 ? (
-            comunidades.map((comunidad) => (
+          {comunidadesFiltradas.length > 0 ? (
+            comunidadesFiltradas.map((comunidad) => (
               <div
                 key={comunidad.id}
                 className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer shadow"
@@ -79,7 +93,7 @@ useEffect(() => {
             ))
           ) : (
             <p className="text-gray-500">
-              No perteneces a ninguna comunidad todavía.
+              No se encontraron comunidades con ese nombre.
             </p>
           )}
         </div>
