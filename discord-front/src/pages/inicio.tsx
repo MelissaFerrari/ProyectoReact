@@ -1,5 +1,8 @@
+ /*`Bearer ${token}`*/
+
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 
 interface Comunidad {
@@ -11,34 +14,33 @@ interface Comunidad {
 function Inicio() {
   const { usuario, token } = useContext(AuthContext);
   const [comunidades, setComunidades] = useState<Comunidad[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-useEffect(() => {
-  const fetchComunidades = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:3000/api/communities",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  useEffect(() => {
+    const fetchComunidades = async () => {
+      if (!token) return;
 
-      setComunidades(response.data);
-    } catch (error) {
-      console.error("Error al traer comunidades:", error);
-    }
-  };
+      try {
+        const response = await axios.get<Comunidad[]>(
+          "http://localhost:3000/api/communities",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setComunidades(response.data);
+      } catch (error) {
+        console.error("Error al traer comunidades:", error);
+      }
+    };
 
-  if (token) {
     fetchComunidades();
-  }
-}, [token]);
+  }, [token]);
 
-    const comunidadesFiltradas = comunidades.filter((comunidad) =>
-        comunidad.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const comunidadesFiltradas = comunidades.filter((comunidad) =>
+    comunidad.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (!usuario) {
     return (
@@ -56,18 +58,15 @@ useEffect(() => {
           {usuario.nombre_usuario.charAt(0).toUpperCase()}
         </div>
 
-        <h2 className="mt-4 text-2xl font-semibold">
-          {usuario.nombre_usuario}
-        </h2>
-
+        <h2 className="mt-4 text-2xl font-semibold">{usuario.nombre_usuario}</h2>
         <p className="text-gray-400">{usuario.email}</p>
       </div>
 
-      {/* 📚 Comunidades */}
+      {/* Comunidades */}
       <div>
         <h3 className="text-xl font-bold mb-4">Tus Comunidades</h3>
 
-        {/* 🔍 Buscador */}
+        {/* Buscador */}
         <input
           type="text"
           placeholder="Buscar comunidad..."
@@ -76,20 +75,18 @@ useEffect(() => {
           className="w-full p-3 mb-6 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
+        {/* Grid de comunidades */}
         <div className="grid gap-4">
           {comunidadesFiltradas.length > 0 ? (
             comunidadesFiltradas.map((comunidad) => (
-              <div
+              <Link
                 key={comunidad.id}
-                className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer shadow"
+                to={`/communities/${comunidad.id}`}
+                className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer shadow block"
               >
-                <h4 className="font-semibold text-lg">
-                  {comunidad.nombre}
-                </h4>
-                <p className="text-gray-400 text-sm">
-                  {comunidad.descripcion}
-                </p>
-              </div>
+                <h4 className="font-semibold text-lg">{comunidad.nombre}</h4>
+                <p className="text-gray-400 text-sm">{comunidad.descripcion}</p>
+              </Link>
             ))
           ) : (
             <p className="text-gray-500">
