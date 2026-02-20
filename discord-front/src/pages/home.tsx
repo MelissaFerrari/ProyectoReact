@@ -9,7 +9,7 @@ export default function Home() {
       </p>
 
       <div style={styles.buttonContainer}>
-        <Link to="/app" style={styles.primaryButton}>
+        <Link to="/registro" style={styles.primaryButton}>
           Crear usuario
         </Link>
 

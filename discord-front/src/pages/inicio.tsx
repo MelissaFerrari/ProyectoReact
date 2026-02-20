@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 
 interface Comunidad {
@@ -12,7 +12,10 @@ interface Comunidad {
 }
 
 function Inicio() {
-  const { usuario, token } = useContext(AuthContext);
+  const { usuario, token, logout } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
   const [comunidades, setComunidades] = useState<Comunidad[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -42,6 +45,12 @@ function Inicio() {
     comunidad.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const manejarCerrarSesion = () => {
+    // Usar el logout del AuthContext
+    if (typeof logout === "function") logout();
+    navigate("/", { replace: true });
+  };
+
   if (!usuario) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -50,16 +59,25 @@ function Inicio() {
     );
   }
 
-  return (
+return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      {/* Usuario */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="w-32 h-32 rounded-full bg-blue-600 flex items-center justify-center text-4xl font-bold shadow-lg">
-          {usuario.nombre_usuario.charAt(0).toUpperCase()}
+      {/* Cabecera con usuario y botón de cerrar sesión */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg font-bold shadow-lg">
+            {usuario.nombre_usuario.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-semibold">{usuario.nombre_usuario}</div>
+            <div className="text-sm text-gray-400">{usuario.email}</div>
+          </div>
         </div>
-
-        <h2 className="mt-4 text-2xl font-semibold">{usuario.nombre_usuario}</h2>
-        <p className="text-gray-400">{usuario.email}</p>
+        <button
+          onClick={manejarCerrarSesion}
+          className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-md text-white font-semibold"
+        >
+          Cerrar sesión
+        </button>
       </div>
 
       {/* Comunidades */}
@@ -98,5 +116,7 @@ function Inicio() {
     </div>
   );
 }
+
+
 
 export default Inicio;
