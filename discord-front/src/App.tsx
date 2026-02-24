@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/home";
 import Login from "./pages/login";
 import Inicio from "./pages/inicio";
+import Registro from "./pages/registro";
 import { AuthProvider } from "./context/authContext";
 import ComunidadFull from "./pages/comunidadFull";
 
@@ -10,9 +10,9 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Inicio />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/communities/:id" element={<ComunidadFull />} />
         </Routes>
       </BrowserRouter>

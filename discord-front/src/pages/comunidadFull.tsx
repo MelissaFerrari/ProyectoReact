@@ -1,6 +1,6 @@
 // ComunidadFull.tsx
 import { useEffect, useState, useContext } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/authContext";
 
@@ -33,6 +33,7 @@ const API = "http://localhost:3000/api";
 const ComunidadFull = () => {
   const { id } = useParams<{ id: string }>();
   const { usuario, token } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [comunidad, setComunidad] = useState<ComunidadFullData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +68,8 @@ const ComunidadFull = () => {
 
   // ── Crear publicación ──────────────────────────────────────────
   const crearPublicacion = async () => {
-    if (!nuevaPub.trim() || !usuario) return;
+    if (!nuevaPub.trim()) return;
+    if (!usuario) { navigate("/login"); return; }
     setLoadingPub(true);
     try {
       const res = await axios.post<Publicacion>(
@@ -115,7 +117,8 @@ const ComunidadFull = () => {
   // ── Crear comentario ───────────────────────────────────────────
   const crearComentario = async (pubId: number) => {
     const contenido = nuevosComs[pubId]?.trim();
-    if (!contenido || !usuario) return;
+    if (!contenido) return;
+    if (!usuario) { navigate("/login"); return; }
     try {
       const res = await axios.post<Comentario>(
         `${API}/comments`,
@@ -173,34 +176,46 @@ const ComunidadFull = () => {
   if (!comunidad) return <p className="text-center mt-8 text-white">No se encontró la comunidad</p>;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 max-w-3xl mx-auto">
+    <div className="min-h-screen w-full bg-gray-900 text-white p-8">
       <h1 className="text-3xl font-bold mb-4">{comunidad.nombre}</h1>
 
       <Link
-        to="/inicio"
+        to="/"
         className="inline-block mb-6 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
       >
         ← Volver a comunidades
       </Link>
 
       {/* ── Crear publicación ── */}
-      <div className="mb-8 p-4 bg-gray-800 rounded-xl">
-        <h2 className="font-semibold mb-2">Nueva publicación</h2>
-        <textarea
-          rows={3}
-          value={nuevaPub}
-          onChange={(e) => setNuevaPub(e.target.value)}
-          placeholder="¿Qué querés compartir?"
-          className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-        />
-        <button
-          onClick={crearPublicacion}
-          disabled={loadingPub || !nuevaPub.trim()}
-          className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded font-semibold transition"
-        >
-          {loadingPub ? "Publicando..." : "Publicar"}
-        </button>
-      </div>
+      {usuario ? (
+        <div className="mb-8 p-4 bg-gray-800 rounded-xl">
+          <h2 className="font-semibold mb-2">Nueva publicación</h2>
+          <textarea
+            rows={3}
+            value={nuevaPub}
+            onChange={(e) => setNuevaPub(e.target.value)}
+            placeholder="¿Qué querés compartir?"
+            className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          />
+          <button
+            onClick={crearPublicacion}
+            disabled={loadingPub || !nuevaPub.trim()}
+            className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded font-semibold transition"
+          >
+            {loadingPub ? "Publicando..." : "Publicar"}
+          </button>
+        </div>
+      ) : (
+        <div className="mb-8 p-4 bg-gray-800 rounded-xl text-center">
+          <p className="text-gray-400 mb-3">¿Querés publicar algo?</p>
+          <Link
+            to="/login"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold transition inline-block"
+          >
+            Inicia sesión para publicar
+          </Link>
+        </div>
+      )}
 
       {/* ── Lista de publicaciones ── */}
       {comunidad.publicaciones.length > 0 ? (
@@ -248,25 +263,36 @@ const ComunidadFull = () => {
               )}
 
               {/* Crear comentario */}
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={nuevosComs[pub.id] ?? ""}
-                  onChange={(e) =>
-                    setNuevosComs((prev) => ({ ...prev, [pub.id]: e.target.value }))
-                  }
-                  onKeyDown={(e) => e.key === "Enter" && crearComentario(pub.id)}
-                  placeholder="Escribí un comentario..."
-                  className="flex-1 p-2 rounded bg-gray-700 text-white text-sm border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <button
-                  onClick={() => crearComentario(pub.id)}
-                  disabled={!nuevosComs[pub.id]?.trim()}
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded text-sm font-semibold transition"
-                >
-                  Comentar
-                </button>
-              </div>
+              {usuario ? (
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    value={nuevosComs[pub.id] ?? ""}
+                    onChange={(e) =>
+                      setNuevosComs((prev) => ({ ...prev, [pub.id]: e.target.value }))
+                    }
+                    onKeyDown={(e) => e.key === "Enter" && crearComentario(pub.id)}
+                    placeholder="Escribí un comentario..."
+                    className="flex-1 p-2 rounded bg-gray-700 text-white text-sm border border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={() => crearComentario(pub.id)}
+                    disabled={!nuevosComs[pub.id]?.trim()}
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded text-sm font-semibold transition"
+                  >
+                    Comentar
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <Link
+                    to="/login"
+                    className="text-sm text-blue-400 hover:text-blue-300 transition"
+                  >
+                    Inicia sesión para comentar
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         ))

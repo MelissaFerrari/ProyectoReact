@@ -24,11 +24,10 @@ function Inicio() {
 
   useEffect(() => {
     const fetchComunidades = async () => {
-      if (!token) return;
       try {
         const response = await axios.get<Comunidad[]>(
           "http://localhost:3000/api/communities",
-          { headers: { Authorization: `Bearer ${token}` } }
+          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
         );
         setComunidades(response.data);
       } catch (error) {
@@ -44,11 +43,12 @@ function Inicio() {
 
   const manejarCerrarSesion = () => {
     if (typeof logout === "function") logout();
-    navigate("/", { replace: true });
+    navigate("/");
   };
 
   const crearComunidad = async () => {
-    if (!nombreNueva.trim() || !token) return;
+    if (!nombreNueva.trim()) return;
+    if (!token) { navigate("/login"); return; }
     setLoadingCrear(true);
     try {
       const res = await axios.post<Comunidad>(
@@ -67,47 +67,61 @@ function Inicio() {
     }
   };
 
-  if (!usuario) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <h2>No estás autenticado</h2>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen w-full bg-gray-900 text-white p-8">
 
       {/* Cabecera */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg font-bold shadow-lg">
-            {usuario.nombre_usuario.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div className="font-semibold">{usuario.nombre_usuario}</div>
-            <div className="text-sm text-gray-400">{usuario.email}</div>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setModalAbierto(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white font-semibold transition"
-          >
-            + Crear comunidad
-          </button>
-          <button
-            onClick={manejarCerrarSesion}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-md text-white font-semibold transition"
-          >
-            Cerrar sesión
-          </button>
-        </div>
+        {usuario ? (
+          <>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-lg font-bold shadow-lg">
+                {usuario.nombre_usuario.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div className="font-semibold">{usuario.nombre_usuario}</div>
+                <div className="text-sm text-gray-400">{usuario.email}</div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setModalAbierto(true)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white font-semibold transition"
+              >
+                + Crear comunidad
+              </button>
+              <button
+                onClick={manejarCerrarSesion}
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-md text-white font-semibold transition"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold">MyCommunity</h2>
+            <div className="flex gap-2">
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-white font-semibold transition"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/registro"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white font-semibold transition"
+              >
+                Registrarse
+              </Link>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Comunidades */}
       <div>
-        <h3 className="text-xl font-bold mb-4">Tus Comunidades</h3>
+        <h3 className="text-xl font-bold mb-4">{usuario ? "Tus Comunidades" : "Comunidades"}</h3>
 
         <input
           type="text"
@@ -120,14 +134,14 @@ function Inicio() {
         <div className="grid gap-4">
           {comunidadesFiltradas.length > 0 ? (
             comunidadesFiltradas.map((comunidad) => (
-              <Link
+              <div
                 key={comunidad.id}
-                to={`/communities/${comunidad.id}`}
-                className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer shadow block"
+                onClick={() => navigate(`/communities/${comunidad.id}`)}
+                className="bg-gray-800 p-4 rounded-xl hover:bg-gray-700 transition cursor-pointer shadow"
               >
                 <h4 className="font-semibold text-lg">{comunidad.nombre}</h4>
                 <p className="text-gray-400 text-sm">{comunidad.descripcion}</p>
-              </Link>
+              </div>
             ))
           ) : (
             <p className="text-gray-500">

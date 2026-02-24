@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/authContext";
 
@@ -24,7 +24,7 @@ function Login() {
       // 🔹 Ahora usamos el contexto
       login(token, usuario);
 
-      navigate("/inicio");
+      navigate("/");
     } catch (error) {
       alert("Credenciales incorrectas");
     }
@@ -61,6 +61,13 @@ function Login() {
             Ingresar
           </button>
         </form>
+
+        <p className="mt-6 text-center text-gray-400 text-sm">
+          ¿No tenés cuenta?{" "}
+          <Link to="/registro" className="text-blue-400 hover:text-blue-300 transition">
+            Registrate
+          </Link>
+        </p>
       </div>
     </div>
   );
