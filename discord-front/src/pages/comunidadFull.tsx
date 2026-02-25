@@ -28,7 +28,7 @@ interface ComunidadFullData {
   publicaciones: Publicacion[];
 }
 
-const API = "http://localhost:3000/api";
+const API = "https://proyectoconnodeyexpress-production.up.railway.app/api";
 
 const ComunidadFull = () => {
   const { id } = useParams<{ id: string }>();

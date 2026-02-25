@@ -26,7 +26,7 @@ function Inicio() {
     const fetchComunidades = async () => {
       try {
         const response = await axios.get<Comunidad[]>(
-          "http://localhost:3000/api/communities",
+          "https://proyectoconnodeyexpress-production.up.railway.app/api/communities",
           token ? { headers: { Authorization: `Bearer ${token}` } } : {}
         );
         setComunidades(response.data);
@@ -52,7 +52,7 @@ function Inicio() {
     setLoadingCrear(true);
     try {
       const res = await axios.post<Comunidad>(
-        "http://localhost:3000/api/communities",
+        "https://proyectoconnodeyexpress-production.up.railway.app/api/communities",
         { nombre: nombreNueva, descripcion: descripcionNueva },
         { headers: { Authorization: `Bearer ${token}` } }
       );

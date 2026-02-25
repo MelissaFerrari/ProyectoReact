@@ -21,7 +21,7 @@ function Registro() {
     }
 
     try {
-      await axios.post("http://localhost:3000/api/auth/register", {
+      await axios.post("https://proyectoconnodeyexpress-production.up.railway.app/api/auth/register", {
         nombre_usuario: nombre,
         email,
         password,
