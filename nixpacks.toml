@@ -1,0 +1,10 @@
+providers = ["node"]
+
+[phases.install]
+cmds = ["cd discord-front && npm install"]
+
+[phases.build]
+cmds = ["cd discord-front && npm run build"]
+
+[start]
+cmd = "cd discord-front && npm run preview"
