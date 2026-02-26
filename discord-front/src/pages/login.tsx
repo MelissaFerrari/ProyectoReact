@@ -9,9 +9,11 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     try {
       const response = await axios.post(
@@ -26,7 +28,7 @@ function Login() {
 
       navigate("/");
     } catch (error) {
-      alert("Credenciales incorrectas");
+      setError("Credenciales incorrectas");
     }
   };
 
@@ -36,6 +38,13 @@ function Login() {
         <h1 className="text-3xl font-bold text-white mb-6 text-center">
           Iniciar Sesión
         </h1>
+
+        {/* 👈 agregado, igual que en registro */}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 text-red-300 text-sm p-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <input
