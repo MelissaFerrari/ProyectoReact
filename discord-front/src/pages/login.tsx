@@ -10,10 +10,12 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+     setLoading(true);
 
     try {
       const response = await axios.post(
@@ -29,6 +31,8 @@ function Login() {
       navigate("/");
     } catch (error) {
       setError("Credenciales incorrectas");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,13 +67,14 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded-lg text-white font-semibold"
-          >
-            Ingresar
-          </button>
-        </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition p-3 rounded-lg text-white font-semibold"
+              >
+                {loading ? "Ingresando..." : "Ingresar"}
+              </button>
+            </form>
 
         <p className="mt-6 text-center text-gray-400 text-sm">
           ¿No tenés cuenta?{" "}
